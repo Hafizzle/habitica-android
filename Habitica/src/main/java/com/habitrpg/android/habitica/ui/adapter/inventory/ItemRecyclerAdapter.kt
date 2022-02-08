@@ -114,7 +114,10 @@ class ItemRecyclerAdapter(val context: Context) : BaseRecyclerViewAdapter<OwnedI
                 val sdf = SimpleDateFormat("MM", Locale.getDefault())
                 val month = sdf.format(Date())
                 imageName = "inventory_present_$month"
-            } else {
+            } else if(ownedItem.itemType == "special"){
+                imageName = "shop_" + ownedItem.key
+            }
+            else {
                 val type = when (ownedItem.itemType) {
                     "eggs" -> "Egg"
                     "food" -> "Food"

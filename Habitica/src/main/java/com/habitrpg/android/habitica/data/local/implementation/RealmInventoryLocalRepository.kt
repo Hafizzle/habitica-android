@@ -96,7 +96,7 @@ class RealmInventoryLocalRepository(realm: Realm) : RealmContentLocalRepository(
                 "hatchingPotions" -> it.items?.hatchingPotions
                 "food" -> it.items?.food
                 "quests" -> it.items?.quests
-                "special" -> it.items?.special?.ownedItems
+                "special" -> it.items?.special?.getTransformationItems()
                 else -> emptyList()
             } ?: emptyList()
             if (includeZero) {
