@@ -49,8 +49,8 @@ class InventoryRepositoryImpl(localRepository: InventoryLocalRepository, apiClie
         return localRepository.getEquipmentType(type, set)
     }
 
-    override fun getOwnedItems(itemType: String, includeZero: Boolean): Flowable<out List<OwnedItem>> {
-        return localRepository.getOwnedItems(itemType, userID, includeZero)
+    override fun getOwnedItems(itemType: String, includeZero: Boolean, includeTransformationItems: Boolean): Flowable<out List<OwnedItem>> {
+        return localRepository.getOwnedItems(itemType, userID, includeZero, includeTransformationItems)
     }
 
     override fun getOwnedItems(includeZero: Boolean): Flowable<Map<String, OwnedItem>> {

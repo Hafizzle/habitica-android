@@ -204,7 +204,7 @@ class ItemRecyclerFragment : BaseFragment<FragmentItemsBinding>(), SwipeRefreshL
         }
         itemType?.let { type ->
             compositeSubscription.add(
-                inventoryRepository.getOwnedItems(type)
+                inventoryRepository.getOwnedItems(type, includeTransformationItems = true)
                     .map { it.distinctBy { it.key } }
                     .doOnNext { items ->
                         adapter?.data = items

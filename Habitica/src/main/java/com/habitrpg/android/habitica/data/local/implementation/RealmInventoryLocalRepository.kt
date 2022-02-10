@@ -10,7 +10,6 @@ import io.reactivex.rxjava3.core.Flowable
 import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.Sort
-import io.realm.kotlin.isManaged
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
@@ -89,17 +88,19 @@ class RealmInventoryLocalRepository(realm: Realm) : RealmContentLocalRepository(
         )
     }
 
-    override fun getOwnedItems(itemType: String, userID: String, includeZero: Boolean): Flowable<out List<OwnedItem>> {
+    override fun getOwnedItems(itemType: String, userID: String, includeZero: Boolean, includeTransformationItems: Boolean): Flowable<out List<OwnedItem>> {
         return queryUser(userID).map {
             val items = when (itemType) {
                 "eggs" -> it.items?.eggs
                 "hatchingPotions" -> it.items?.hatchingPotions
                 "food" -> it.items?.food
                 "quests" -> it.items?.quests
-                "special" -> it.items?.special?.ownedItems
+                "special" -> it.items?.special?.includeTransformationItems() //Fix Logic
                 else -> emptyList()
             } ?: emptyList()
-            if (includeZero) {
+            if (includeZero) {//Fix Logic
+                items
+            }else if(includeTransformationItems && itemType == "special") {
                 items
             } else {
                 items.filter { it.numberOwned > 0 }

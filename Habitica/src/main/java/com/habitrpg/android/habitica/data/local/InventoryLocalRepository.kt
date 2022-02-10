@@ -28,7 +28,7 @@ interface InventoryLocalRepository : ContentLocalRepository {
 
     fun getItems(itemClass: Class<out Item>, keys: Array<String>): Flowable<out List<Item>>
     fun getItems(itemClass: Class<out Item>): Flowable<out List<Item>>
-    fun getOwnedItems(itemType: String, userID: String, includeZero: Boolean): Flowable<out List<OwnedItem>>
+    fun getOwnedItems(itemType: String, userID: String, includeZero: Boolean, includeTransformationItems: Boolean): Flowable<out List<OwnedItem>>
     fun getOwnedItems(userID: String, includeZero: Boolean): Flowable<Map<String, OwnedItem>>
     fun getEquipmentType(type: String, set: String): Flowable<out List<Equipment>>
 

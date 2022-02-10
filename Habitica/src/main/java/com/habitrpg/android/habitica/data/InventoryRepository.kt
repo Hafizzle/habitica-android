@@ -31,7 +31,7 @@ interface InventoryRepository : BaseRepository {
     fun getOwnedEquipment(type: String): Flowable<out List<Equipment>>
     fun getEquipmentType(type: String, set: String): Flowable<out List<Equipment>>
 
-    fun getOwnedItems(itemType: String, includeZero: Boolean = false): Flowable<out List<OwnedItem>>
+    fun getOwnedItems(itemType: String, includeZero: Boolean = false, includeTransformationItems: Boolean = false): Flowable<out List<OwnedItem>>
     fun getOwnedItems(includeZero: Boolean = false): Flowable<Map<String, OwnedItem>>
 
     fun getEquipment(key: String): Flowable<Equipment>
