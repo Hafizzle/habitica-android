@@ -68,7 +68,7 @@ class MainActivityViewModel: BaseViewModel() {
 
     fun onCreate() {
         try {
-            taskAlarmManager.scheduleAllSavedAlarms(sharedPreferences.getBoolean("preventDailyReminder", false))
+            taskAlarmManager.scheduleAllSavedAlarms(sharedPreferences.getBoolean("preventDailyReminder", false), false)
         } catch (e: Exception) {
             analyticsManager.logException(e)
         }

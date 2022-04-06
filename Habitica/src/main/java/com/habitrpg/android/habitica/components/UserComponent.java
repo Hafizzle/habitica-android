@@ -12,6 +12,7 @@ import com.habitrpg.android.habitica.receivers.LocalNotificationActionReceiver;
 import com.habitrpg.android.habitica.receivers.NotificationPublisher;
 import com.habitrpg.android.habitica.receivers.TaskAlarmBootReceiver;
 import com.habitrpg.android.habitica.receivers.TaskReceiver;
+import com.habitrpg.android.habitica.receivers.TimeZoneChangedReceiver;
 import com.habitrpg.android.habitica.ui.activities.AdventureGuideActivity;
 import com.habitrpg.android.habitica.ui.activities.ChallengeFormActivity;
 import com.habitrpg.android.habitica.ui.activities.ClassSelectionActivity;
@@ -260,6 +261,8 @@ public interface UserComponent {
     void inject(TaskReceiver taskReceiver);
 
     void inject(TaskAlarmBootReceiver taskAlarmBootReceiver);
+
+    void inject(TimeZoneChangedReceiver timeZoneChangedReceiver);
 
     void inject(HabiticaFirebaseMessagingService habiticaFirebaseMessagingService);
 

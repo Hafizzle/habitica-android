@@ -220,6 +220,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".receivers.TimeZoneChangedReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
         <activity android:name=".ui.activities.AddTaskWidgetActivity"
             android:exported="false">
             <intent-filter>

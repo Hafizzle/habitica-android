@@ -103,6 +103,7 @@ class TaskSerializer : JsonSerializer<Task>, JsonDeserializer<Task> {
                 reminder.id = remindersObject.getAsString("id")
                 reminder.startDate = context.deserialize(remindersObject.get("startDate"), Date::class.java)
                 reminder.time = context.deserialize(remindersObject.get("time"), Date::class.java)
+                reminder.localTimeString = remindersObject.getAsString("time")
                 task.reminders?.add(reminder)
             }
         }
@@ -207,6 +208,7 @@ class TaskSerializer : JsonSerializer<Task>, JsonDeserializer<Task> {
                 jsonObject.addProperty("startDate", item.startDate?.time)
             }
             jsonObject.addProperty("time", item.time?.time ?: Date().time)
+            jsonObject.addProperty("localTimeString", item.localTimeString)
             jsonArray.add(jsonObject)
         }
         return jsonArray

@@ -22,13 +22,13 @@ import java.util.*
 class TaskAlarmManager(private var context: Context, private var taskRepository: TaskRepository, private var userId: String) {
     private val am: AlarmManager? = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 
-    private fun setAlarmsForTask(task: Task) {
+    private fun setAlarmsForTask(task: Task, isTimeZoneChanged: Boolean) {
         task.reminders?.let {
             for (reminder in it) {
                 var currentReminder = reminder
                 if (task.type == TaskType.DAILY) {
                     // Ensure that we set to the next available time
-                    currentReminder = this.setTimeForDailyReminder(currentReminder, task)
+                    currentReminder = this.setTimeForDailyReminder(currentReminder, task, isTimeZoneChanged)
                 }
                 this.setAlarmForRemindersItem(task, currentReminder)
             }
@@ -50,15 +50,15 @@ class TaskAlarmManager(private var context: Context, private var taskRepository:
         taskRepository.getTaskCopy(taskId)
             .filter { task -> task.isValid && task.isManaged && TaskType.DAILY == task.type }
             .firstElement()
-            .subscribe({ this.setAlarmsForTask(it) }, RxErrorHandler.handleEmptyError())
+            .subscribe({ this.setAlarmsForTask(it, false) }, RxErrorHandler.handleEmptyError())
     }
 
-    fun scheduleAllSavedAlarms(preventDailyReminder: Boolean) {
+    fun scheduleAllSavedAlarms(preventDailyReminder: Boolean, isTimeZoneChanged: Boolean) {
         taskRepository.getTaskCopies(userId)
             .firstElement()
             .toFlowable()
             .flatMap { Flowable.fromIterable(it) }
-            .subscribe({ this.setAlarmsForTask(it) }, RxErrorHandler.handleEmptyError())
+            .subscribe({ this.setAlarmsForTask(it, isTimeZoneChanged) }, RxErrorHandler.handleEmptyError())
 
         if (!preventDailyReminder) {
             scheduleDailyReminder(context)
@@ -66,11 +66,14 @@ class TaskAlarmManager(private var context: Context, private var taskRepository:
     }
 
     fun scheduleAlarmsForTask(task: Task) {
-        setAlarmsForTask(task)
+        setAlarmsForTask(task, false)
     }
 
-    private fun setTimeForDailyReminder(remindersItem: RemindersItem?, task: Task): RemindersItem? {
-        val oldTime = remindersItem?.time
+    private fun setTimeForDailyReminder(remindersItem: RemindersItem?, task: Task, isTimeZoneChanged: Boolean): RemindersItem? {
+        var oldTime = remindersItem?.time
+        if (isTimeZoneChanged){
+            oldTime = remindersItem?.getLocalWallClockTime()
+        }
         val newTime = task.getNextReminderOccurence(oldTime) ?: return null
         val calendar = Calendar.getInstance()
         calendar.time = newTime
