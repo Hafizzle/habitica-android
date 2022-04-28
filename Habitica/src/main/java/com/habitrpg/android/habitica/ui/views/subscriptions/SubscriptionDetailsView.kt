@@ -64,17 +64,6 @@ class SubscriptionDetailsView : LinearLayout {
             plan.dateTerminated != null -> binding.subscriptionDurationTextView.text = resources.getString(R.string.ending_on, DateFormat.getDateInstance().format(plan.dateTerminated ?: Date()))
         }
 
-        if ((plan.extraMonths ?: 0) > 0) {
-            binding.subscriptionCreditWrapper.visibility = View.VISIBLE
-            if (plan.extraMonths == 1) {
-                binding.subscriptionCreditTextView.text = resources.getString(R.string.one_month)
-            } else {
-                binding.subscriptionCreditTextView.text = resources.getString(R.string.x_months, plan.extraMonths)
-            }
-        } else {
-            binding.subscriptionCreditWrapper.visibility = View.GONE
-        }
-
         when (plan.paymentMethod) {
             "Amazon Payments" -> binding.paymentProcessorImageView.setImageResource(R.drawable.payment_amazon)
             "Apple" -> binding.paymentProcessorImageView.setImageResource(R.drawable.payment_apple)
@@ -94,10 +83,12 @@ class SubscriptionDetailsView : LinearLayout {
         if (plan.consecutive?.count == 1) {
             binding.monthsSubscribedTextView.text = resources.getString(R.string.one_month)
         } else {
-            binding.monthsSubscribedTextView.text = resources.getString(R.string.x_months, plan.consecutive?.count ?: 0)
+            binding.monthsSubscribedTextView.text = plan.consecutive?.count.toString()
         }
         binding.gemCapTextView.text = plan.totalNumberOfGems.toString()
         binding.currentHourglassesTextView.text = plan.consecutive?.trinkets.toString()
+        binding.gemIcon.setImageBitmap(HabiticaIconsHelper.imageOfGem())
+        binding.hourglassIcon.setImageBitmap(HabiticaIconsHelper.imageOfHourglass())
 
         binding.changeSubscriptionButton.visibility = View.VISIBLE
         if (plan.paymentMethod != null) {

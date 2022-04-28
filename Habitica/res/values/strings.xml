@@ -430,9 +430,11 @@
     <string name="cancel_subscription_notgoogle_description">No longer want to subscribe? Due to constraints on mobile payments, you\'ll need to cancel via our website. To do this, tap the button below, log in to your account, tap the User icon in the top right, then go to Subscription. Any months of subscription credit will be applied after your subscription has ended. We\'ll miss you!</string>
     <string name="visit_habitica_website">Visit Habitica Website</string>
     <string name="current_bonuses">Current Bonuses</string>
-    <string name="months_subscribed">Months subscribed</string>
+    <string name="months_subscribed">Sub Months</string>
     <string name="current_hourclasses">Current Mystic Hourglasses</string>
-    <string name="monthly_gem_cap">Monthly gem cap</string>
+    <string name="next_hourglass">Next Hourglass*</string>
+    <string name="monthly_gem_cap">Gem Cap</string>
+    <string name="monthly_gem_cap_bonus">Gem Cap Bonus</string>
     <string name="inactive">Inactive</string>
     <string name="one_month">1 Month</string>
     <string name="x_months">%d Months</string>
@@ -442,6 +444,7 @@
     <string name="twelve_months">12 months</string>
     <string name="subscribe_prompt_thanks">You get these benefits for being a Subscriber</string>
     <string name="subscription_status">Subscription Status</string>
+    <string name="subscription_stats">Subscription Stats</string>
 
     <string name="challenge_leave_title">Leave Challenge</string>
     <string name="challenge_leave_description">You can choose to keep this Challenge\'s tasks on your personal task board or delete them when you leave</string>

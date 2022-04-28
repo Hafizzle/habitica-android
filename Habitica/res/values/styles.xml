@@ -532,9 +532,9 @@
     </style>
 
     <style name="subscriptionBoxText.Subtitle">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:fontFamily" tools:targetApi="jelly_bean">
-            @string/font_family_regular
+            @string/font_family_medium
         </item>
         <item name="android:textColor">@color/text_primary</item>
     </style>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/subscriptionDetails"
     android:orientation="vertical"
@@ -113,86 +114,156 @@
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/subscriptionBox"
         android:orientation="vertical">
+
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/current_bonuses"
+            android:id="@+id/textView2"
             style="@style/subscriptionBoxText.Title"
-            android:layout_marginBottom="4dp"/>
-        <LinearLayout
-            android:id="@+id/subscription_credit_wrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/subscription_credit"
-                style="@style/subscriptionBoxText.Subtitle"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Pill"
-                android:id="@+id/subscription_credit_text_view"
-                tools:text="32 Months" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+            android:gravity="center"
+            android:text="@string/subscription_stats"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/monthsSubscribedTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/months_subscribed"
-                style="@style/subscriptionBoxText.Subtitle"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Pill"
-                android:id="@+id/monthsSubscribedTextView"
-                tools:text="32 Months" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="@dimen/spacing_small"
+            android:textColor="@color/gray_10"
+            android:fontFamily="@string/font_family_medium"
+            app:layout_constraintStart_toEndOf="@+id/calendar_icon"
+            app:layout_constraintTop_toBottomOf="@+id/textView2"
+            tools:text="32" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="1dp"
+            android:layout_height="50dp"
+            android:alpha=".3"
+            android:background="@color/gray_100"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/textView3"
+            app:layout_constraintStart_toEndOf="@+id/textView4" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="50dp"
+            android:background="@color/gray_100"
+            android:alpha=".3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/textView5"
+            app:layout_constraintStart_toEndOf="@+id/textView3" />
+
+
+        <ImageView
+            android:id="@+id/gem_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="@dimen/spacing_small"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+        <TextView
+            android:id="@+id/gemCapTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/monthly_gem_cap"
-                style="@style/subscriptionBoxText.Subtitle" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Pill"
-                android:id="@+id/gemCapTextView"
-                tools:text="50 Gems" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/current_hourclasses"
-                style="@style/subscriptionBoxText.Subtitle" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Pill"
-                android:id="@+id/currentHourglassesTextView"
-                tools:text="4" />
-        </LinearLayout>
-    </LinearLayout>
+            android:layout_marginStart="@dimen/spacing_small"
+            android:fontFamily="@string/font_family_medium"
+            android:textColor="@color/gray_10"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/gem_icon"
+            app:layout_constraintTop_toBottomOf="@+id/textView2"
+            app:layout_goneMarginStart="@dimen/spacing_small"
+            tools:text="50" />
+
+        <TextView
+            android:id="@+id/textView4"
+            style="@style/subscriptionBoxText.Subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:layout_marginEnd="30dp"
+            android:text="@string/months_subscribed"
+            android:textColor="@color/gray_100"
+            app:layout_constraintEnd_toStartOf="@+id/gem_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/calendar_icon" />
+
+        <TextView
+            android:id="@+id/textView3"
+            style="@style/subscriptionBoxText.Subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:text="@string/monthly_gem_cap_bonus"
+
+            android:textColor="@color/gray_100"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gem_icon" />
+
+
+        <ImageView
+            android:id="@+id/calendar_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="30dp"
+            android:src="@drawable/task_icon_calendar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/gem_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+
+        <ImageView
+            android:id="@+id/hourglass_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+
+            android:layout_marginStart="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/gem_icon"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+        <TextView
+            android:id="@+id/currentHourglassesTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_small"
+            android:fontFamily="@string/font_family_medium"
+            android:textColor="@color/gray_10"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/hourglass_icon"
+            app:layout_constraintTop_toBottomOf="@+id/textView2"
+            tools:text="Jul" />
+
+        <TextView
+            android:id="@+id/textView5"
+            style="@style/subscriptionBoxText.Subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:gravity="center"
+            android:text="@string/next_hourglass"
+
+            android:textColor="@color/gray_100"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/gem_icon"
+            app:layout_constraintTop_toBottomOf="@+id/hourglass_icon" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:id="@+id/change_subscription_wrapper"
