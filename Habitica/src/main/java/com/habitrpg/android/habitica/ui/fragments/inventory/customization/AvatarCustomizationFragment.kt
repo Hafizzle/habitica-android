@@ -308,6 +308,7 @@ class AvatarCustomizationFragment :
             binding.monthReleasedWrapper.visibility = View.GONE
         }
         dialog.setContentView(binding.root)
+        dialog.setOnDismissListener { updateFilterIcon() }
         dialog.show()
     }
 
