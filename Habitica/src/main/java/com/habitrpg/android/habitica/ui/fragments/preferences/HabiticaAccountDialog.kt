@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.habitrpg.android.habitica.R
@@ -14,7 +15,7 @@ import com.habitrpg.android.habitica.databinding.DialogHabiticaAccountBinding
 import com.habitrpg.android.habitica.models.user.User
 
 
-class HabiticaAccountDialog(private var thisContext: Context, ) : DialogFragment(R.layout.dialog_habitica_account) {
+class HabiticaAccountDialog(private var thisContext: Context) : DialogFragment(R.layout.dialog_habitica_account) {
 
     private var _binding: DialogHabiticaAccountBinding? = null
     private val binding get() = _binding!!
@@ -30,6 +31,7 @@ class HabiticaAccountDialog(private var thisContext: Context, ) : DialogFragment
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         when (accountAction) {
             "reset_account" -> setResetAccountViews()
