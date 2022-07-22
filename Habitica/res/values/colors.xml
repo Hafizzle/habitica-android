@@ -143,6 +143,7 @@
     <color name="setup_background">@color/window_background</color>
     <color name="setup_label_background">@color/offset_background_30</color>
     <color name="animalitem_all_eggs">#6ECDB2</color>
+    <color name="back_button">#000000</color>
 
     <color name="dark_brown">#794b00</color>
     <color name="blue_1">#033f5e</color>

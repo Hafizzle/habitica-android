@@ -19,32 +19,30 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageButton
-                android:id="@+id/back_imagebutton"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="@dimen/button_padding_small"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="8dp"
-                android:src="@drawable/ic_arrow_back_white_36dp"
-                app:tint="@android:color/black" />
+                <ImageButton
+                    android:id="@+id/back_imagebutton"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/button_padding_small"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_arrow_back_white_36dp"
+                    app:tint="@color/back_button" />
 
-            <TextView
-                android:id="@+id/confirm_action_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="10dp"
-                android:alpha=".4"
-                android:background="?attr/selectableItemBackground"
-                android:fontFamily="@string/font_family_medium"
-                android:padding="8dp"
-                android:text="@string/delete_account"
-                android:textColor="@color/gray_200"
-                android:textSize="18sp" />
-
+                <TextView
+                    android:id="@+id/confirm_action_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="10dp"
+                    android:alpha=".4"
+                    android:fontFamily="@string/font_family_medium"
+                    android:padding="8dp"
+                    android:text="@string/delete_account"
+                    android:textColor="@color/gray_300"
+                    android:textSize="18sp" />
         </RelativeLayout>
 
 

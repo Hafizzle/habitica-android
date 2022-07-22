@@ -48,7 +48,7 @@ class HabiticaAccountDialog(private var thisContext: Context, ) : DialogFragment
 
         binding.confirmationInputEdittext.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                binding.confirmActionTextview.setTextColor(ContextCompat.getColor(thisContext, R.color.gray_10))
+                binding.confirmActionTextview.setTextColor(ContextCompat.getColor(thisContext, R.color.gray_300))
                 binding.confirmActionTextview.alpha = .4f
             }
 
@@ -57,7 +57,7 @@ class HabiticaAccountDialog(private var thisContext: Context, ) : DialogFragment
                     binding.confirmActionTextview.setTextColor(ContextCompat.getColor(thisContext, R.color.red_100))
                     binding.confirmActionTextview.alpha = 1.0f
                 } else {
-                    binding.confirmActionTextview.setTextColor(ContextCompat.getColor(thisContext, R.color.gray_10))
+                    binding.confirmActionTextview.setTextColor(ContextCompat.getColor(thisContext, R.color.gray_300))
                     binding.confirmActionTextview.alpha = .4f
                 }
             }
@@ -85,7 +85,7 @@ class HabiticaAccountDialog(private var thisContext: Context, ) : DialogFragment
 
         binding.confirmationInputEdittext.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                binding.confirmActionTextview.setTextColor(ContextCompat.getColor(thisContext, R.color.gray_10))
+                binding.confirmActionTextview.setTextColor(ContextCompat.getColor(thisContext, R.color.gray_300))
                 binding.confirmActionTextview.alpha = .4f
             }
 
@@ -97,7 +97,7 @@ class HabiticaAccountDialog(private var thisContext: Context, ) : DialogFragment
                         binding.confirmActionTextview.alpha = 1.0f
                     }
                 } else {
-                    binding.confirmActionTextview.setTextColor(ContextCompat.getColor(thisContext, R.color.gray_10))
+                    binding.confirmActionTextview.setTextColor(ContextCompat.getColor(thisContext, R.color.gray_300))
                     binding.confirmActionTextview.alpha = .4f
                 }
             }
