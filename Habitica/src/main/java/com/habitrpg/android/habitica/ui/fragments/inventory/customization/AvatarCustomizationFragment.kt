@@ -1,6 +1,7 @@
 package com.habitrpg.android.habitica.ui.fragments.inventory.customization
 
 import android.graphics.PorterDuff
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -317,8 +318,11 @@ class AvatarCustomizationFragment :
         button.text
         button.setOnCheckedChangeListener { _, isChecked ->
             if (!isChecked && filter.months.contains(identifier)) {
+                button.typeface = Typeface.create("sans-serif", Typeface.NORMAL)
+
                 filter.months.remove(identifier)
             } else if (isChecked && !filter.months.contains(identifier)) {
+                button.typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
                 filter.months.add(identifier)
             }
             currentFilter.onNext(filter)
