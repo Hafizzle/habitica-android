@@ -4,30 +4,25 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import androidx.preference.DialogPreference
-import java.text.DateFormat
-import java.util.Calendar
-import java.util.Locale
+import com.habitrpg.android.habitica.extensions.parseToZonedDateTimeDefault
+import java.time.format.DateTimeFormatter
 
 class TimePreference(ctxt: Context, attrs: AttributeSet?) : DialogPreference(ctxt, attrs) {
     private var timeval: String? = null
+
     override fun onGetDefaultValue(a: TypedArray, index: Int): Any {
         return a.getString(index)!!
     }
 
     override fun onSetInitialValue(defaultValue: Any?) {
-        timeval = null
-        timeval = if (defaultValue == null) {
-            getPersistedString("19:00")
-        } else {
-            getPersistedString(defaultValue.toString())
-        }
+        timeval = getPersistedString(defaultValue?.toString() ?: "19:00")
         summary = timeval ?: ""
     }
 
     val lastHour: Int
-        get() = getHour(timeval)
+        get() = timeval.parseToZonedDateTimeDefault().hour
     val lastMinute: Int
-        get() = getMinute(timeval)
+        get() = timeval.parseToZonedDateTimeDefault().minute
     var text: String?
         get() = timeval
         set(text) {
@@ -41,21 +36,9 @@ class TimePreference(ctxt: Context, attrs: AttributeSet?) : DialogPreference(ctx
         }
 
     override fun setSummary(summary: CharSequence?) {
-        val calendar = Calendar.getInstance(Locale.getDefault())
-        calendar.set(Calendar.HOUR_OF_DAY, getHour(timeval))
-        calendar.set(Calendar.MINUTE, getMinute(timeval))
-        val formatter = DateFormat.getTimeInstance(DateFormat.SHORT)
-        super.setSummary(formatter.format(calendar.time))
-    }
-
-    companion object {
-        fun getHour(timeval: String?): Int {
-            return timeval?.split(":")?.get(0)?.toInt() ?: 0
-        }
-
-        fun getMinute(timeval: String?): Int {
-            return timeval?.split(":")?.get(1)?.toInt() ?: 0
-        }
+        val time = timeval.parseToZonedDateTimeDefault()
+        val formatter = DateTimeFormatter.ofPattern("h:mm a")
+        super.setSummary(time.format(formatter))
     }
 
     init {

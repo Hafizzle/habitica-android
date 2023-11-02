@@ -13,6 +13,9 @@ import androidx.core.content.edit
 import com.habitrpg.android.habitica.R
 import com.habitrpg.android.habitica.data.TaskRepository
 import com.habitrpg.android.habitica.data.UserRepository
+import com.habitrpg.android.habitica.extensions.isOlderThanDays
+import com.habitrpg.android.habitica.extensions.isSameDayAs
+import com.habitrpg.android.habitica.extensions.toZonedDateTimeLocal
 import com.habitrpg.android.habitica.extensions.withImmutableFlag
 import com.habitrpg.android.habitica.helpers.TaskAlarmManager
 import com.habitrpg.android.habitica.ui.activities.MainActivity
@@ -21,8 +24,9 @@ import com.habitrpg.shared.habitica.models.tasks.TaskType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.firstOrNull
-import java.util.Calendar
-import java.util.Date
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Random
 import javax.inject.Inject
 
@@ -50,7 +54,8 @@ class NotificationPublisher : BroadcastReceiver() {
 
         var wasInactive = false
         // Show special notification if user hasn't logged in for a week
-        if (sharedPreferences.getLong("lastAppLaunch", Date().time) < (Date().time - 604800000L)) {
+        val lastAppLaunch = ZonedDateTime.ofInstant(Instant.ofEpochMilli(sharedPreferences.getLong("lastAppLaunch", ZonedDateTime.now().toInstant().toEpochMilli())), ZoneId.systemDefault())
+        if (lastAppLaunch.isOlderThanDays(7)) {
             wasInactive = true
             sharedPreferences.edit { putBoolean("preventDailyReminder", true) }
         } else {
@@ -69,7 +74,7 @@ class NotificationPublisher : BroadcastReceiver() {
                     }
                 }
                 if (showNotifications) {
-                    notify(intent, buildNotification(wasInactive, user?.authentication?.timestamps?.createdAt))
+                    notify(intent, buildNotification(wasInactive, user?.authentication?.timestamps?.createdAt?.toZonedDateTimeLocal()))
                 }
             }
         } else {
@@ -83,32 +88,30 @@ class NotificationPublisher : BroadcastReceiver() {
         notification?.let { notificationManager?.notify(id, it) }
     }
 
-    private fun buildNotification(wasInactive: Boolean, registrationDate: Date? = null): Notification? {
+    private fun buildNotification(wasInactive: Boolean, registrationDate: ZonedDateTime? = null): Notification? {
         val thisContext = context ?: return null
         val notification: Notification
         val builder = NotificationCompat.Builder(thisContext, "default")
         builder.setContentTitle(thisContext.getString(R.string.reminder_title))
         var notificationText = getRandomDailyTip()
-        if (registrationDate != null) {
-            val registrationCal = Calendar.getInstance()
-            registrationCal.time = registrationDate
-            val todayCal = Calendar.getInstance()
-            val isSameDay = (
-                registrationCal.get(Calendar.YEAR) == todayCal.get(Calendar.YEAR) &&
-                    registrationCal.get(Calendar.DAY_OF_YEAR) == todayCal.get(Calendar.DAY_OF_YEAR)
-                )
-            val isPreviousDay = (
-                registrationCal.get(Calendar.YEAR) == todayCal.get(Calendar.YEAR) &&
-                    registrationCal.get(Calendar.DAY_OF_YEAR) == (todayCal.get(Calendar.DAY_OF_YEAR) - 1)
-                )
-            if (isSameDay) {
-                builder.setContentTitle(thisContext.getString(R.string.same_day_reminder_title))
-                notificationText = thisContext.getString(R.string.same_day_reminder_text)
-            } else if (isPreviousDay) {
-                builder.setContentTitle(thisContext.getString(R.string.next_day_reminder_title))
-                notificationText = thisContext.getString(R.string.next_day_reminder_text)
+
+        registrationDate?.let {
+            val today = ZonedDateTime.now()
+            val isSameDay = it.isSameDayAs(today)
+            val isPreviousDay = it.plusDays(1).isSameDayAs(today)
+
+            when {
+                isSameDay -> {
+                    builder.setContentTitle(thisContext.getString(R.string.same_day_reminder_title))
+                    notificationText = thisContext.getString(R.string.same_day_reminder_text)
+                }
+                isPreviousDay -> {
+                    builder.setContentTitle(thisContext.getString(R.string.next_day_reminder_title))
+                    notificationText = thisContext.getString(R.string.next_day_reminder_text)
+                }
             }
         }
+
         if (wasInactive) {
             builder.setContentText(thisContext.getString(R.string.week_reminder_title))
             notificationText = thisContext.getString(R.string.week_reminder_text)

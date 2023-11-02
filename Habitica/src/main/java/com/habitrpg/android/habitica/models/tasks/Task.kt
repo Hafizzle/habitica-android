@@ -7,8 +7,8 @@ import android.text.Spanned
 import com.google.gson.annotations.SerializedName
 import com.habitrpg.android.habitica.R
 import com.habitrpg.android.habitica.extensions.dayOfWeekString
-import com.habitrpg.android.habitica.extensions.parseToZonedDateTime
-import com.habitrpg.android.habitica.extensions.toZonedDateTime
+import com.habitrpg.android.habitica.extensions.parseToZonedDateTimeUTC
+import com.habitrpg.android.habitica.extensions.toZonedDateTimeLocal
 import com.habitrpg.android.habitica.models.BaseMainObject
 import com.habitrpg.android.habitica.models.Tag
 import com.habitrpg.common.habitica.helpers.ExceptionHandler
@@ -24,7 +24,6 @@ import io.realm.annotations.PrimaryKey
 import org.json.JSONArray
 import org.json.JSONException
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Date
@@ -155,7 +154,7 @@ open class Task : RealmObject, BaseMainObject, Parcelable, BaseTask {
     }
 
     fun isDueToday(): Boolean? {
-        val zonedDueDate = dueDate?.toZonedDateTime()
+        val zonedDueDate = dueDate?.toZonedDateTimeLocal()
         if (zonedDueDate != null) {
             val day = ZonedDateTime.now().dayOfYear
             val year = ZonedDateTime.now().year
@@ -165,7 +164,7 @@ open class Task : RealmObject, BaseMainObject, Parcelable, BaseTask {
     }
 
     fun isDayOrMorePastDue(): Boolean? {
-        val zonedDueDate = dueDate?.toZonedDateTime()
+        val zonedDueDate = dueDate?.toZonedDateTimeLocal()
         return zonedDueDate?.toLocalDate()?.isBefore(LocalDate.now())
     }
 
@@ -344,37 +343,44 @@ open class Task : RealmObject, BaseMainObject, Parcelable, BaseTask {
         if (remindersItem == null) {
             return null
         }
-        val reminderTime = remindersItem.time?.parseToZonedDateTime()
-        val zonedDateTimeNow = ZonedDateTime.now()
-        return if (nextDue?.firstOrNull() != null && (!isDisplayedActive || reminderTime?.isBefore(zonedDateTimeNow) == true)
-        ) {
+        val reminderTimeUTC = remindersItem.time?.parseToZonedDateTimeUTC()
+        val currentTimeNowUTC = ZonedDateTime.now(ZoneId.of("UTC"))
+
+        return if (nextDue?.firstOrNull() != null && (!isDisplayedActive || reminderTimeUTC?.isBefore(currentTimeNowUTC) == true)) {
             val repeatingDays = repeat?.dayStrings(context)
-            val isScheduledForToday = repeatingDays?.find { day -> day == zonedDateTimeNow.dayOfWeekString() }
+            val isScheduledForToday = repeatingDays?.find { day -> day == currentTimeNowUTC.dayOfWeekString() }
             if (isScheduledForToday != null) {
-                val currentDateTime = LocalDateTime.now()
-                val updatedDateTime: LocalDateTime = LocalDateTime.of(
-                    currentDateTime.year,
-                    currentDateTime.month,
-                    currentDateTime.dayOfMonth,
-                    reminderTime?.hour ?: 0,
-                    reminderTime?.minute ?: 0
+                val localZoneId = ZoneId.systemDefault()
+                val zonedDateTimeNowLocal = currentTimeNowUTC.withZoneSameInstant(localZoneId)
+                ZonedDateTime.of(
+                    zonedDateTimeNowLocal.year,
+                    zonedDateTimeNowLocal.monthValue,
+                    zonedDateTimeNowLocal.dayOfMonth,
+                    reminderTimeUTC?.hour ?: 0,
+                    reminderTimeUTC?.minute ?: 0,
+                    0,
+                    0,
+                    localZoneId
                 )
-                updatedDateTime.atZone(ZoneId.systemDefault())
             } else {
-                val nextDate = LocalDateTime.ofInstant(nextDue?.firstOrNull()?.toInstant(), ZoneId.systemDefault())
-                val updatedDateTime: LocalDateTime = LocalDateTime.of(
-                    nextDate.year,
-                    nextDate.month,
-                    nextDate.dayOfMonth,
-                    reminderTime?.hour ?: 0,
-                    reminderTime?.minute ?: 0
+                val nextDateUTC = ZonedDateTime.ofInstant(nextDue?.firstOrNull()?.toInstant(), ZoneId.of("UTC"))
+                val localZoneId = ZoneId.systemDefault()
+                ZonedDateTime.of(
+                    nextDateUTC.year,
+                    nextDateUTC.monthValue,
+                    nextDateUTC.dayOfMonth,
+                    reminderTimeUTC?.hour ?: 0,
+                    reminderTimeUTC?.minute ?: 0,
+                    0,
+                    0,
+                    localZoneId
                 )
-                updatedDateTime.atZone(ZoneId.systemDefault())
             }
         } else {
-            return reminderTime
+            return reminderTimeUTC?.withZoneSameInstant(ZoneId.systemDefault())
         }
     }
+
 
     fun parseMarkdown() {
         parsedText = MarkdownParser.parseMarkdown(text)

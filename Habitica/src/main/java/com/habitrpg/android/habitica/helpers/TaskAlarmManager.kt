@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Build
 import androidx.preference.PreferenceManager
 import com.habitrpg.android.habitica.data.TaskRepository
+import com.habitrpg.android.habitica.extensions.parseToZonedDateTimeDefault
+import com.habitrpg.android.habitica.extensions.toEpochMilli
 import com.habitrpg.android.habitica.extensions.withImmutableFlag
 import com.habitrpg.android.habitica.models.tasks.RemindersItem
 import com.habitrpg.android.habitica.models.tasks.Task
@@ -25,8 +27,6 @@ import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Date
 
 class TaskAlarmManager(
     private var context: Context,
@@ -36,15 +36,13 @@ class TaskAlarmManager(
     private val am: AlarmManager? = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 
     private fun setAlarmsForTask(task: Task) {
-        task.reminders?.let {
-            for (reminder in it) {
-                var currentReminder = reminder
-                if (task.type == TaskType.DAILY) {
-                    // Ensure that we set to the next available time
-                    currentReminder = this.setTimeForDailyReminder(currentReminder, task)
-                }
-                this.setAlarmForRemindersItem(task, currentReminder)
+        task.reminders?.forEach { reminder ->
+            val updatedReminder = if (task.type == TaskType.DAILY) {
+                setTimeForDailyReminder(reminder, task)
+            } else {
+                reminder
             }
+            setAlarmForRemindersItem(task, updatedReminder)
         }
     }
 
@@ -83,7 +81,7 @@ class TaskAlarmManager(
 
     private fun setTimeForDailyReminder(remindersItem: RemindersItem?, task: Task): RemindersItem? {
         val newTime = task.getNextReminderOccurrence(remindersItem, context)
-        remindersItem?.time = newTime?.withZoneSameLocal(ZoneId.systemDefault())?.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        remindersItem?.time = newTime?.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
         return remindersItem
     }
@@ -95,8 +93,9 @@ class TaskAlarmManager(
      * which is indicated by first nextDue being null (As the alarm is created before the API returns nextDue times)
      */
     private fun setAlarmForRemindersItem(reminderItemTask: Task, remindersItem: RemindersItem?) {
-        val now = ZonedDateTime.now().withZoneSameLocal(ZoneId.systemDefault())?.toInstant()
-        val zonedTime = remindersItem?.getLocalZonedDateTimeInstant()
+        val now = ZonedDateTime.now().withZoneSameLocal(ZoneId.systemDefault())
+        // use parseToZonedDateTimeDefault due to updated reminder time being in ISO_LOCAL_DATE_TIME format (and already converted to local time)
+        val zonedTime = remindersItem?.time?.parseToZonedDateTimeDefault()
         if (remindersItem == null ||
             (reminderItemTask.type == TaskType.DAILY && zonedTime?.isBefore(now) == true && reminderItemTask.nextDue?.firstOrNull() != null) ||
             (reminderItemTask.type == TaskType.TODO && zonedTime?.isBefore(now) == true || zonedTime == null)
@@ -129,7 +128,7 @@ class TaskAlarmManager(
             withImmutableFlag(PendingIntent.FLAG_CANCEL_CURRENT)
         )
 
-        setAlarm(context, zonedTime.toEpochMilli(), sender)
+        setAlarm(context, zonedTime, sender)
     }
 
     private fun removeAlarmForRemindersItem(remindersItem: RemindersItem) {
@@ -157,19 +156,16 @@ class TaskAlarmManager(
             if (prefs.getBoolean("use_reminder", false)) {
                 val timeval = prefs.getString("reminder_time", "19:00")
 
-                val pieces =
-                    timeval?.split(":".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
-                        ?: return
-                val hour = Integer.parseInt(pieces[0])
-                val minute = Integer.parseInt(pieces[1])
-                val cal = Calendar.getInstance()
-                cal.set(Calendar.HOUR_OF_DAY, hour)
-                cal.set(Calendar.MINUTE, minute)
-                cal.set(Calendar.SECOND, 0)
-                if (cal.timeInMillis < Date().time) {
-                    cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) + 1)
+                val pieces = timeval?.split(":")?.takeIf { it.size == 2 } ?: return
+                val hour = pieces[0].toIntOrNull() ?: return
+                val minute = pieces[1].toIntOrNull() ?: return
+
+                val now = ZonedDateTime.now()
+                var triggerTime = now.withHour(hour).withMinute(minute).withSecond(0)
+
+                if (triggerTime.isBefore(now)) {
+                    triggerTime = triggerTime.plusDays(1)
                 }
-                val triggerTime = cal.timeInMillis
 
                 val notificationIntent = Intent(context, NotificationPublisher::class.java)
                 notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, 1)
@@ -182,16 +178,16 @@ class TaskAlarmManager(
                     notificationIntent,
                     withImmutableFlag(PendingIntent.FLAG_NO_CREATE)
                 )
-                if (previousSender != null) {
-                    previousSender.cancel()
-                    alarmManager?.cancel(previousSender)
+                previousSender?.let {
+                    it.cancel()
+                    alarmManager?.cancel(it)
                 }
 
                 val pendingIntent = PendingIntent.getBroadcast(
                     context,
                     0,
                     notificationIntent,
-                    withImmutableFlag(PendingIntent.FLAG_UPDATE_CURRENT)
+                    PendingIntent.FLAG_UPDATE_CURRENT
                 )
 
                 setAlarm(context, triggerTime, pendingIntent)
@@ -206,28 +202,35 @@ class TaskAlarmManager(
             alarmManager?.cancel(displayIntent)
         }
 
-        private fun setAlarm(context: Context, time: Long, pendingIntent: PendingIntent?) {
-            HLogger.log(LogLevel.INFO, "TaskAlarmManager", "Scheduling for $time")
+        private fun setAlarm(context: Context, zonedDateTime: ZonedDateTime, pendingIntent: PendingIntent?) {
+            HLogger.log(LogLevel.INFO, "TaskAlarmManager", "Scheduling for ${zonedDateTime.toEpochMilli()}")
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 
             if (pendingIntent == null) {
                 return
             }
 
+            val now = ZonedDateTime.now()
+            var triggerTime = now.withHour(zonedDateTime.hour).withMinute(zonedDateTime.minute).withSecond(0)
+
+            if (triggerTime.isBefore(now)) {
+                triggerTime = triggerTime.plusDays(1)
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // For SDK >= Android 12, allows batching of reminders
                 try {
-                    alarmManager?.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, pendingIntent)
+                    alarmManager?.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime.toEpochMilli(), pendingIntent)
                 } catch (ex: Exception) {
                     when (ex) {
                         is IllegalStateException, is SecurityException -> {
-                            alarmManager?.setWindow(AlarmManager.RTC_WAKEUP, time, 60000, pendingIntent)
+                            alarmManager?.setWindow(AlarmManager.RTC_WAKEUP, triggerTime.toEpochMilli(), 60000, pendingIntent)
                         }
                         else -> throw ex
                     }
                 }
             } else {
-                alarmManager?.setWindow(AlarmManager.RTC_WAKEUP, time, 60000, pendingIntent)
+                alarmManager?.setWindow(AlarmManager.RTC_WAKEUP, triggerTime.toEpochMilli(), 60000, pendingIntent)
             }
         }
     }
